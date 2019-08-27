@@ -7,6 +7,7 @@ warnings.filterwarnings('ignore')
 
 img_file = 'city.jpg'
 
+
 # k-means中的k值，即选择几个中心点
 k = 5
 
@@ -24,6 +25,13 @@ estimator = KMeans(n_clusters=k, max_iter=4000, init='k-means++', n_init=50)  # 
 estimator.fit(img1)  # 聚类
 centroids = estimator.cluster_centers_  # 获取聚类中心
 
+
+colorLabels = list(estimator.labels_)
+for center_index in range(k):
+    colorRatio = colorLabels.count(center_index)/len(colorLabels)
+    print('类别：', center_index, '比例:', colorRatio, '色彩:', centroids[center_index])
+    
+    
 # 使用算法跑出的中心点，生成一个矩阵，为数据可视化做准备
 result = []
 result_width = 200
