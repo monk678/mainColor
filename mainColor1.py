@@ -2,11 +2,11 @@ from skimage import io
 from sklearn.cluster import KMeans
 import numpy as np
 import warnings
+import os
 
 warnings.filterwarnings('ignore')
 
 img_file = 'city.jpg'
-
 
 # k-means中的k值，即选择几个中心点
 k = 5
@@ -27,9 +27,15 @@ centroids = estimator.cluster_centers_  # 获取聚类中心
 
 
 colorLabels = list(estimator.labels_)
+colorInfo = {}
 for center_index in range(k):
     colorRatio = colorLabels.count(center_index)/len(colorLabels)
-    print('类别：', center_index, '比例:', colorRatio, '色彩:', centroids[center_index])
+    colorInfo[colorRatio] = centroids[center_index]
+
+# 根据比例排序，从高至第低
+colorInfo = [(k,colorInfo[k]) for k in sorted(colorInfo.keys(), reverse=True)] 
+for color in colorInfo:
+    print('比例：', color[0], '颜色：', color[1])
     
     
 # 使用算法跑出的中心点，生成一个矩阵，为数据可视化做准备
@@ -37,9 +43,9 @@ result = []
 result_width = 200
 result_height_per_center = 80
 for center_index in range(k):
-    result.append(np.full((result_width * result_height_per_center, n_channels), centroids[center_index], dtype=int))
+    result.append(np.full((result_width * result_height_per_center, n_channels), colorInfo[center_index][1], dtype=int))
 result = np.array(result)
 result = result.reshape((result_height_per_center * k, result_width, n_channels))
 
 # 保存图片
-io.imsave(img_file + '.result.bmp', result)
+io.imsave(os.path.splitext(img_file)[0] + '_result.bmp', result)
